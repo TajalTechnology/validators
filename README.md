@@ -2,14 +2,21 @@
 
 ```js
 // Call it in app level. & use common validation rules.
-const validate = new Validator();
+//Default call customize validation
+// Otherwise call existing lib joi or yup or e.t.c.
+import joi from 'joi';
+const validate = new Validator() / new Validator(lib-name?:"joi");
 App.use(validate);
 
 // Set customize rules & mapping it with request endpoint
-const rules = {
+const postJobsRules = {
     name: "int|min:100",
     location: "int|min:100",
 };
+//Example
+const configValidation = {
+    POST_JOBS: postJobsRules;
+}
 ```
 
 ```mermaid
