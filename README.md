@@ -12,7 +12,7 @@ const rules = {
 };
 ```
 
-```js
+```mermaid
 classDiagram
 
     class Validator {
