@@ -1,102 +1,98 @@
-## body-data-validator
-
-It is a JavaScript module (NodeJS) managing form inputs validation
-
-### Installation
-
-This is a [Node.js] (https://nodejs.org/en/) module available at [npm registry] (https://www.npmjs.com/).
-
-```bash
-$ npm install body-data-validator
-```
-
-### API
-
-Once you have it installed, you should now call the initialization middleware.
-In case you are using [Express] (https://www.npmjs.com/package/express) you can insert it as below:
+### Client usage
 
 ```js
-const express = require('express');
-const bodyParser = require('body-parser');
-const validator = require('body-data-validator');
+// Call it in app level. & use common validation rules.
+const validate = new Validator();
+App.use(validate);
 
-const app = express();
-
-app.use(bodyParser.json());
-// From here
-app.use(validator.init);
-
-app.post('/api/users/create', (req, res, next) => {
-    // 
-})
-
-app.listen(3000)
+// Set customize rules & mapping it with request endpoint
+const rules = {
+    name: "int|min:100",
+    location: "int|min:100",
+};
 ```
-
-After adding the initialization middleware, the `validator` adds to the req.body object a method called `verify` (`req.body.verify`) which receives two parameters.
 
 ```js
-let rules = {
-	name: 'required|min:3|max:30',
-	firstname: 'min:3|max:30',
-	email: 'required|email'
-}
+classDiagram
 
-req.body.verify(rules, (valid, errors) => {
-	if (valid) {
-		console.log("Ok")
-	}else {
-		console.log(errors)
-	}
-})
+    class Validator {
+        %%Take decition which validator can be use
+        %%Default GrootsValidator
+        +constructor(lib-name?:name);
+    }
+
+    class Context {
+        +private strategy: IGrootsValidation;
+        +setStrategy(IGrootsValidation: strategy) void;
+        +executeStrategy(property:any) validateProperty;
+    }
+
+    Context o--|> IGrootsValidation
+    class IGrootsValidation{
+        <<interface>>
+        +validateProperty(property:any) Promise~obj~;
+    }
+
+    ConcreteValidation .. Validator
+    ConcreteValidation "1" *-- IsNulable : composition
+    ConcreteValidation "1" *-- MinChar : composition
+    ConcreteValidation "1" *-- MaxChar : composition
+    ConcreteValidation "1" *-- Required : composition
+    class ConcreteValidation{
+        +public context object;
+        +property:any;
+        +constractor(this.parseProperty);%% Take decition which class will be execute(switch)
+        +parseProperty(property:any) Promise~array~;
+    }
+
+    Context --|> GrootsValidator
+    Context --|> YupValidator
+    Context --|> JoiValidator
+    GrootsValidator <|.. Validator : Inheritance
+    GrootsValidator <|.. ConcreteValidation : composition
+    class GrootsValidator{
+        +concateRules(rules:json): void;
+    }
+
+    JoiValidator <|.. Validator : Inheritance
+    JoiValidator <|.. ConcreteValidation : composition
+    class JoiValidator{
+        +concateRules(rules:json);
+    }
+
+    YupValidator <|.. Validator : Inheritance
+    YupValidator <|.. ConcreteValidation : composition
+    class YupValidator{
+        +concateRules(rules:json);
+    }
+
+    IGrootsValidation <|.. MinChar : implements
+    class MinChar {
+        +property:any;
+        +number:int;
+        +constructor(property:any,number:int);
+        +validateProperty(property:any) Promise~obj~;
+    }
+
+    IGrootsValidation <|.. MaxChar : implements
+    class MaxChar {
+        +property:string;
+        +number:int;
+        +constructor(property:any,number:int);
+        +validateProperty(property:any) Promise~obj~;
+    }
+
+    IGrootsValidation <|.. Required : implements
+    class Required {
+        +property:any;
+        +constructor(property:any);
+        +validateProperty(property:any) Promise~obj~;
+    }
+
+    IGrootsValidation <|.. IsNulable : implements
+    class IsNulable {
+        +property:any;
+        +constructor(property:any);
+        +validateProperty(property:any) Promise~obj~;
+    }
 ```
-
-#### validator.verify (rules, callback)
-
-This method is the one which launches all the monoworks, it receives 2 parameters:
-
-1. `rules` the rules on the data elements to check for validity.
-2. `callback (valid, errorrs)` The second parameter is the callback function to be called, which in return receives two parameters.
-* `valid`: Equals` true` if everything is correct and there is no error and `false` otherwise
-* `errors`: Object, containing the list of errors whose key name is the name of the data and the value is the error message (`errors.name`)
-
-#### The available rules
-
-* `required`: The field is required, mandatory
-* `email`: The value of the field must be a valid email address
-* `min: n`:` n` represents the minimum number of characters this field must have
-* `max: n`:` n` represents the maximum number of characters this field must have
-* `int`: The value of chmap must be an integer
-* `alpha: n`: The value of the chmap must be a string` n` (optional) represents the number of characters this field must have
-* `tel`: The value of the field must be a valid phone number
-
-> Note: In case you need to ensure that the name of the field to display the message to the user is not that of the sent data field, you can specify this name by adding the rule `field: Name to display`.
-
-Example
-```js
-let rules = {
-	name: 'field:Nom|required|min:3|max:30',
-	firstname: 'min:3|field:Prénom|max:30|alpha',
-	email: 'required|email|field:Adresse email'
-}
-
-req.body.verify(rules, (valid, errors) => {
-	if (valid) {
-		console.log("Ok")
-	}else {
-		console.log(errors)
-	}
-})
-```
-
-### Roadmap
-
-<a href="https://trello.com/invite/b/FJxAzsc6/ebc27d25fd036bb93e5e0105721c295d/body-data-validator" target="_blank">Click here</a> to open the new features roadmap
-
-#### Features
-
-* Add the validation rule of a File field, with the possibility of specifying the type of file
-* Ability to add your own validation rules
-* Integration of the i18n system of error messages
-
-[@bolenge](https://github.com/bolenge)
