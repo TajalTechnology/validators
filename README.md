@@ -2,7 +2,7 @@
 
 ```js
 // Call it in app level. & use common validation rules.
-//Default call customize validation
+//Default call customize validation.
 // Otherwise call existing lib joi or yup or e.t.c.
 import joi from 'joi';
 const validate = new Validator() / new Validator(lib-name?:"joi");
@@ -59,47 +59,73 @@ classDiagram
     GrootsValidator <|.. ConcreteValidation : composition
     class GrootsValidator{
         +concateRules(rules:json): void;
+        +constructor(concreteValidation: ConcreteValidation);
     }
 
     JoiValidator <|.. Validator : Inheritance
     JoiValidator <|.. ConcreteValidation : composition
     class JoiValidator{
         +concateRules(rules:json);
+        +constructor(concreteValidation: new ConcreteValidation);
     }
 
     YupValidator <|.. Validator : Inheritance
     YupValidator <|.. ConcreteValidation : composition
     class YupValidator{
         +concateRules(rules:json);
+        +constructor(concreteValidation: ConcreteValidation);
+    }
+
+    class IErrors{
+        +public errors[]:any;
+        +getErrors() Promise~array~;
+    }
+
+    IErrors <|.. Errors : implements
+    class Errors{
+        +public errors[]:any;
+        +getErrors() Promise~array~;
     }
 
     IGrootsValidation <|.. MinChar : implements
+    IErrors --|> MinChar : composition
     class MinChar {
         +property:any;
+        +errors[]:IErrors;
         +number:int;
-        +constructor(property:any,number:int);
-        +validateProperty(property:any) Promise~obj~;
+        +constructor(property:any,number:int, errors:IErrors);
+        +validateProperty(property:any, this.errors) Promise~array~;
     }
 
     IGrootsValidation <|.. MaxChar : implements
+    IErrors --|> MaxChar : composition
     class MaxChar {
         +property:string;
+        +errors[]:IErrors;
         +number:int;
-        +constructor(property:any,number:int);
-        +validateProperty(property:any) Promise~obj~;
+        +constructor(property:any,number:int, errors:IErrors);
+        +validateProperty(property:any, this.errors) Promise~array~;
     }
 
     IGrootsValidation <|.. Required : implements
+    IErrors --|> Required : composition
     class Required {
         +property:any;
-        +constructor(property:any);
-        +validateProperty(property:any) Promise~obj~;
+        +errors[]:IErrors;
+        +constructor(property:any,errors:IErrors);
+        +validateProperty(property:any, this.errors) Promise~array~;
     }
 
     IGrootsValidation <|.. IsNulable : implements
+    IErrors --|> IsNulable : composition
     class IsNulable {
         +property:any;
-        +constructor(property:any);
-        +validateProperty(property:any) Promise~obj~;
+        +errors[]:IErrors;
+        +constructor(property:any, this.errors);
+        +validateProperty(property:any,errors:IErrors) Promise~array~;
     }
+
+
+
+
 ```
