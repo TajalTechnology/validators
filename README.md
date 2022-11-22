@@ -40,11 +40,11 @@ classDiagram
         +validateProperty(property:any) Promise~obj~;
     }
 
-    ConcreteValidation .. Validator
     ConcreteValidation "1" *-- IsNulable : composition
     ConcreteValidation "1" *-- MinChar : composition
     ConcreteValidation "1" *-- MaxChar : composition
     ConcreteValidation "1" *-- Required : composition
+    ConcreteValidation --|> Errors : Inheritance
     class ConcreteValidation{
         +public context object;
         +property:any;
@@ -52,9 +52,6 @@ classDiagram
         +parseProperty(property:any) Promise~array~;
     }
 
-    Context --|> GrootsValidator
-    Context --|> YupValidator
-    Context --|> JoiValidator
     GrootsValidator <|.. Validator : Inheritance
     GrootsValidator <|.. ConcreteValidation : composition
     class GrootsValidator{
