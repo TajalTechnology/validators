@@ -19,7 +19,7 @@ classDiagram
     IErrorType <|.. Validator : composition
     class Validator{
         +constructor(rules:[], errors:IErrorType);
-        +getErrors(): Promise~obj~;
+        +getErrors(rules:[], errors:IErrorType): Promise~obj~;
     }
 
     class IErrorType{
@@ -64,4 +64,6 @@ classDiagram
         +execute():Promise~bool~;
         +validateRule(rule:any, errors:IErrors) Promise~array~;
     }
+
+
 ```
